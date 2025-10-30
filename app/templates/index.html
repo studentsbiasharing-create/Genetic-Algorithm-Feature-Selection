@@ -1,0 +1,305 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero">
+    <div class="container">
+        <div class="hero-content animate-fade-in">
+            <h1 class="hero-title">
+                <span class="gradient-text">Genetic Algorithm</span>
+                <br>Feature Selection
+            </h1>
+            <p class="hero-subtitle">
+                Optimize your machine learning models by finding the most important features using evolutionary algorithms
+            </p>
+            <div class="hero-stats">
+                <div class="stat-card">
+                    <i class="fas fa-bolt"></i>
+                    <div>
+                        <h3>Fast</h3>
+                        <p>Evolutionary optimization</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-chart-line"></i>
+                    <div>
+                        <h3>Accurate</h3>
+                        <p>Superior performance</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-microscope"></i>
+                    <div>
+                        <h3>Comprehensive</h3>
+                        <p>Multiple methods</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Upload Section -->
+<section class="upload-section">
+    <div class="container">
+        <div class="section-header">
+            <h2>Select or Upload Dataset</h2>
+            <p>Choose from existing datasets or upload a new CSV file</p>
+        </div>
+        
+        <div class="upload-container">
+            <!-- Existing Files Section -->
+            <div class="existing-files" id="existingFiles">
+                <h3><i class="fas fa-folder"></i> Available Datasets</h3>
+                <div id="filesList" class="files-list">
+                    <div class="loading-files">
+                        <i class="fas fa-spinner fa-spin"></i> Loading datasets...
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Divider -->
+            <div class="upload-divider">
+                <span>OR</span>
+            </div>
+            
+            <!-- Upload New File Section -->
+            <div class="upload-zone" id="uploadZone">
+                <i class="fas fa-cloud-upload-alt"></i>
+                <h3>Drag & Drop your CSV file here</h3>
+                <p>or click to browse</p>
+                <input type="file" id="fileInput" accept=".csv" hidden>
+                <button class="btn btn-primary" onclick="document.getElementById('fileInput').click()">
+                    <i class="fas fa-folder-open"></i> Browse Files
+                </button>
+            </div>
+            
+            <div id="fileInfo" class="file-info hidden">
+                <div class="file-details">
+                    <i class="fas fa-file-csv"></i>
+                    <div>
+                        <h4 id="fileName">dataset.csv</h4>
+                        <p id="fileStats">Loading...</p>
+                    </div>
+                    <button class="btn-icon" onclick="removeFile()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div id="datasetInfo" class="dataset-info hidden">
+                <h3>Dataset Overview</h3>
+                <div class="info-grid">
+                    <div class="info-card">
+                        <i class="fas fa-database"></i>
+                        <div>
+                            <span class="label">Samples</span>
+                            <span class="value" id="nSamples">-</span>
+                        </div>
+                    </div>
+                    <div class="info-card">
+                        <i class="fas fa-columns"></i>
+                        <div>
+                            <span class="label">Features</span>
+                            <span class="value" id="nFeatures">-</span>
+                        </div>
+                    </div>
+                    <div class="info-card">
+                        <i class="fas fa-tags"></i>
+                        <div>
+                            <span class="label">Classes</span>
+                            <span class="value" id="nClasses">-</span>
+                        </div>
+                    </div>
+                    <div class="info-card">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <div>
+                            <span class="label">Missing Values</span>
+                            <span class="value" id="missingValues">-</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Configuration Section -->
+<section class="config-section hidden" id="configSection">
+    <div class="container">
+        <div class="section-header">
+            <h2>Configure Parameters</h2>
+            <p>Adjust genetic algorithm parameters for optimal results</p>
+        </div>
+        
+        <div class="config-container">
+            <div class="config-grid">
+                <!-- Population Size -->
+                <div class="param-group">
+                    <label for="populationSize">
+                        <i class="fas fa-users"></i>
+                        Population Size
+                        <span class="tooltip" data-tooltip="Number of chromosomes in each generation">
+                            <i class="fas fa-question-circle"></i>
+                        </span>
+                    </label>
+                    <input type="range" id="populationSize" min="10" max="200" value="50" step="10">
+                    <span class="param-value" id="populationSizeValue">50</span>
+                </div>
+                
+                <!-- Generations -->
+                <div class="param-group">
+                    <label for="generations">
+                        <i class="fas fa-sync"></i>
+                        Generations
+                        <span class="tooltip" data-tooltip="Number of evolutionary iterations">
+                            <i class="fas fa-question-circle"></i>
+                        </span>
+                    </label>
+                    <input type="range" id="generations" min="10" max="500" value="100" step="10">
+                    <span class="param-value" id="generationsValue">100</span>
+                </div>
+                
+                <!-- Crossover Rate -->
+                <div class="param-group">
+                    <label for="crossoverRate">
+                        <i class="fas fa-exchange-alt"></i>
+                        Crossover Rate
+                        <span class="tooltip" data-tooltip="Probability of crossover operation (0-1)">
+                            <i class="fas fa-question-circle"></i>
+                        </span>
+                    </label>
+                    <input type="range" id="crossoverRate" min="0" max="1" value="0.8" step="0.05">
+                    <span class="param-value" id="crossoverRateValue">0.80</span>
+                </div>
+                
+                <!-- Mutation Rate -->
+                <div class="param-group">
+                    <label for="mutationRate">
+                        <i class="fas fa-random"></i>
+                        Mutation Rate
+                        <span class="tooltip" data-tooltip="Probability of mutation operation (0-1)">
+                            <i class="fas fa-question-circle"></i>
+                        </span>
+                    </label>
+                    <input type="range" id="mutationRate" min="0" max="1" value="0.1" step="0.05">
+                    <span class="param-value" id="mutationRateValue">0.10</span>
+                </div>
+                
+                <!-- Elite Size -->
+                <div class="param-group">
+                    <label for="eliteSize">
+                        <i class="fas fa-star"></i>
+                        Elite Size
+                        <span class="tooltip" data-tooltip="Number of best solutions to preserve">
+                            <i class="fas fa-question-circle"></i>
+                        </span>
+                    </label>
+                    <input type="range" id="eliteSize" min="1" max="20" value="5" step="1">
+                    <span class="param-value" id="eliteSizeValue">5</span>
+                </div>
+            </div>
+            
+            <div class="action-buttons">
+                <button class="btn btn-primary btn-lg" onclick="runAnalysis()">
+                    <i class="fas fa-play"></i> Run Analysis
+                </button>
+                <button class="btn btn-secondary btn-lg" onclick="resetConfig()">
+                    <i class="fas fa-redo"></i> Reset to Defaults
+                </button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Results Section -->
+<section class="results-section hidden" id="resultsSection">
+    <div class="container">
+        <div class="section-header">
+            <h2>Analysis Results</h2>
+            <p>Comprehensive comparison of feature selection methods</p>
+        </div>
+        
+        <!-- Summary Cards -->
+        <div class="results-summary" id="resultsSummary">
+            <!-- Will be populated by JavaScript -->
+        </div>
+        
+        <!-- Tabs -->
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('overview')">
+                <i class="fas fa-th-large"></i> Overview
+            </button>
+            <button class="tab-btn" onclick="switchTab('ga')">
+                <i class="fas fa-dna"></i> Genetic Algorithm
+            </button>
+            <button class="tab-btn" onclick="switchTab('statistical')">
+                <i class="fas fa-chart-bar"></i> Statistical Methods
+            </button>
+            <button class="tab-btn" onclick="switchTab('comparison')">
+                <i class="fas fa-balance-scale"></i> Comparison
+            </button>
+        </div>
+        
+        <!-- Tab Content -->
+        <div id="tabContent" class="tab-content">
+            <!-- Will be populated by JavaScript -->
+        </div>
+    </div>
+</section>
+
+<!-- About Section -->
+<section class="about-section" id="about">
+    <div class="container">
+        <div class="section-header">
+            <h2>About This Project</h2>
+            <p>Understanding Genetic Algorithm Feature Selection</p>
+        </div>
+        
+        <div class="about-grid">
+            <div class="about-card">
+                <div class="card-icon">
+                    <i class="fas fa-dna"></i>
+                </div>
+                <h3>Genetic Algorithm</h3>
+                <p>Uses evolutionary principles to find optimal feature subsets through selection, crossover, and mutation operations.</p>
+            </div>
+            
+            <div class="about-card">
+                <div class="card-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <h3>Statistical Methods</h3>
+                <p>Compare GA results with traditional methods like Chi-Square, ANOVA, Mutual Information, and more.</p>
+            </div>
+            
+            <div class="about-card">
+                <div class="card-icon">
+                    <i class="fas fa-code-branch"></i>
+                </div>
+                <h3>Optimization</h3>
+                <p>Reduce dimensionality while maintaining or improving model accuracy through intelligent feature selection.</p>
+            </div>
+            
+            <div class="about-card">
+                <div class="card-icon">
+                    <i class="fas fa-project-diagram"></i>
+                </div>
+                <h3>Visualization</h3>
+                <p>Interactive charts and graphs to understand convergence, feature importance, and method comparison.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Initialize after DOM ready
+    document.addEventListener('DOMContentLoaded', function() {
+        initializeUpload();
+        initializeParamSliders();
+    });
+</script>
+{% endblock %}
