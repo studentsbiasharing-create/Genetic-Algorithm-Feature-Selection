@@ -9,6 +9,7 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 # Install minimal runtime libraries for scientific stack (OpenMP)
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libgomp1 \
+    curl \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
@@ -39,17 +40,9 @@ VOLUME ["/app/uploads", "/app/results"]
 
 EXPOSE 8000
 
-# Simple healthcheck against /health
-HEALTHCHECK --interval=30s --timeout=2s --retries=5 CMD python - << 'PY' \
-import os, urllib.request; \
-port=os.environ.get('PORT','8000'); \
-url=f"http://127.0.0.1:{port}/health"; \
-try: \
-    with urllib.request.urlopen(url, timeout=1) as r: \
-        exit(0 if r.status==200 else 1) \
-except Exception: \
-    exit(1) \
-PY
+# Simple healthcheck against /health using curl (preferred by Coolify)
+HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
+    CMD curl -fsS "http://127.0.0.1:${PORT}/health" || exit 1
 
 # Start with gunicorn, binding to the provided PORT
 CMD ["sh", "-c", "exec gunicorn -w ${WEB_CONCURRENCY:-2} -k gthread -t ${GUNICORN_TIMEOUT:-120} -b 0.0.0.0:${PORT} run:app"]
